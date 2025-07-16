@@ -15,14 +15,11 @@ soramiclock/
 │   ├── main.css                  # メインスタイル
 │   ├── colors.css                # カラーパレット
 │   └── background.css            # 背景演出スタイル
-├── js/
-│   ├── clock.js                  # 時計機能
-│   ├── background.js             # 背景演出モジュール
-│   ├── color-interpolation.js    # 色補間システム
-│   └── ambient-occlusion.js      # アンビエントオクルージョン
-└── doc/
-    ├── SPECIFICATION.md          # 仕様書
-    └── task.md                   # タスク管理
+└── js/
+    ├── clock.js                  # 時計機能
+    ├── background.js             # 背景演出モジュール
+    ├── color-interpolation.js    # 色補間システム
+    └── ambient-occlusion.js      # アンビエントオクルージョン
 ```
 
 ## 使用方法
