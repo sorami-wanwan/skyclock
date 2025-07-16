@@ -15,14 +15,11 @@ soramiclock/
 │   ├── main.css                  # Main styles
 │   ├── colors.css                # Color palette
 │   └── background.css            # Background effects styles
-├── js/
-│   ├── clock.js                  # Clock functionality
-│   ├── background.js             # Background effects module
-│   ├── color-interpolation.js    # Color interpolation system
-│   └── ambient-occlusion.js      # Ambient occlusion
-└── doc/
-    ├── SPECIFICATION.md          # Specifications
-    └── task.md                   # Task management
+└── js/
+    ├── clock.js                  # Clock functionality
+    ├── background.js             # Background effects module
+    ├── color-interpolation.js    # Color interpolation system
+    └── ambient-occlusion.js      # Ambient occlusion
 ```
 
 ## Usage
