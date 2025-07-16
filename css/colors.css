@@ -1,0 +1,212 @@
+/* ========================================
+   SkyClock - カラーパレット
+   ======================================== */
+
+/* ========================================
+   時間帯別の空の色変数
+   ======================================== */
+
+:root {
+    
+    --morning-sky-start: #4a3a2a; 
+    --morning-sky-end: #8a6a4a; 
+    
+    
+    --day-sky-start: #307070; 
+    --day-sky-end: #80B8B0; 
+    
+    
+    --sunset-sky-start: #4a3a2a; 
+    --sunset-sky-end: #8a6a4a; 
+    
+    
+    --night-sky-start: #374752; 
+    --night-sky-end: #4A6A7A; 
+    --night-moon-core: rgba(255, 255, 255, 0.9);
+    --night-moon-glow: rgba(200, 200, 255, 0.6);
+    --night-star-color: rgba(255, 255, 255, 0.8);
+    
+    
+    --night-atmosphere-color: rgba(45, 55, 64, 0.4); 
+    --night-atmosphere-heavy: rgba(45, 55, 64, 0.6);
+    
+    
+    --night-fog-light: rgba(55, 71, 82, 0.3); 
+    --night-fog-heavy: rgba(55, 71, 82, 0.5);
+}
+
+/* ========================================
+   時間帯別の山の色変数
+   ======================================== */
+
+:root {
+    
+    --morning-mountain-foreground: #5d4a3a; 
+    --morning-mountain-midground: #7d6a5a; 
+    --morning-mountain-far: #9d8a7a; 
+    --morning-mountain-background: #bd9a8a; 
+    
+    
+    --day-mountain-foreground: #4d6a4a; 
+    --day-mountain-midground: #5d7a5a; 
+    --day-mountain-far: #6d8a6a; 
+    --day-mountain-background: #7d9a7a; 
+    
+    
+    --sunset-mountain-foreground: #5d4a3a; 
+    --sunset-mountain-midground: #7d6a5a; 
+    --sunset-mountain-far: #9d8a7a; 
+    --sunset-mountain-background: #bd9a8a; 
+    
+    
+    --night-mountain-foreground: #4A5A6A; 
+    --night-mountain-midground: #5A6A7A; 
+    --night-mountain-far: #6A7A8A; 
+    --night-mountain-background: #7A8A9A; 
+}
+
+/* ========================================
+   時間帯別の雲の色変数
+   ======================================== */
+
+:root {
+    
+    --morning-cloud-flat: #d4a574; 
+    
+    
+    --day-cloud-flat: #E8E4D9; 
+    
+    
+    --sunset-cloud-flat: #d4a574; 
+    
+    
+    --night-cloud-flat: #4A6A7A; 
+}
+
+/* ========================================
+   時間帯別の霧の色変数
+   ======================================== */
+
+:root {
+    
+    --morning-fog-light: rgba(160, 82, 45, 0.4); 
+    --morning-fog-heavy: rgba(160, 82, 45, 0.6);
+    
+    
+    --day-fog-light: rgba(128, 184, 176, 0.4); 
+    --day-fog-heavy: rgba(128, 184, 176, 0.6);
+    
+    
+    --sunset-fog-light: rgba(160, 82, 45, 0.5); 
+    --sunset-fog-heavy: rgba(160, 82, 45, 0.7);
+    
+    
+    --night-fog-light: rgba(200, 200, 255, 0.08);
+}
+
+/* ========================================
+   時間帯別の空気感レイヤーの色変数
+   ======================================== */
+
+:root {
+    
+    --morning-atmosphere-color: rgba(139, 69, 19, 0.3); 
+    --morning-atmosphere-heavy: rgba(139, 69, 19, 0.5);
+    
+    
+    --day-atmosphere-color: rgba(232, 228, 217, 0.3); 
+    --day-atmosphere-heavy: rgba(232, 228, 217, 0.5);
+    
+    
+    --sunset-atmosphere-color: rgba(139, 69, 19, 0.4); 
+    --sunset-atmosphere-heavy: rgba(139, 69, 19, 0.6);
+    
+    
+    --night-atmosphere-color: rgba(200, 200, 255, 0.08);
+    --night-atmosphere-heavy: rgba(180, 180, 240, 0.15);
+}
+
+/* ========================================
+   時間帯別の粒子の色変数
+   ======================================== */
+
+:root {
+    
+    --morning-particle-color: rgba(255, 218, 185, 0.5); 
+    
+    
+    --day-particle-color: rgba(232, 228, 217, 0.8); 
+    
+    
+    --sunset-particle-color: rgba(255, 218, 185, 0.6); 
+    
+    
+    --night-particle-color: rgba(255, 255, 255, 0.8); 
+}
+
+/* ========================================
+   時間帯クラス別の色適用
+   ======================================== */
+
+
+.time-morning {
+    --current-sky-start: var(--morning-sky-start);
+    --current-sky-end: var(--morning-sky-end);
+    --current-mountain-foreground: var(--morning-mountain-foreground);
+    --current-mountain-midground: var(--morning-mountain-midground);
+    --current-mountain-far: var(--morning-mountain-far);
+    --current-mountain-background: var(--morning-mountain-background);
+    --current-cloud-color: var(--morning-cloud-flat);
+    --current-fog-light: var(--morning-fog-light);
+    --current-atmosphere-color: var(--morning-atmosphere-color);
+    --current-atmosphere-heavy: var(--morning-atmosphere-heavy);
+    --current-particle-color: var(--morning-particle-color);
+}
+
+
+.time-day {
+    --current-sky-start: var(--day-sky-start);
+    --current-sky-end: var(--day-sky-end);
+    --current-mountain-foreground: var(--day-mountain-foreground);
+    --current-mountain-midground: var(--day-mountain-midground);
+    --current-mountain-far: var(--day-mountain-far);
+    --current-mountain-background: var(--day-mountain-background);
+    --current-cloud-color: var(--day-cloud-flat);
+    --current-fog-light: var(--day-fog-light);
+    --current-atmosphere-color: var(--day-atmosphere-color);
+    --current-atmosphere-heavy: var(--day-atmosphere-heavy);
+    --current-particle-color: var(--day-particle-color);
+}
+
+
+.time-sunset {
+    --current-sky-start: var(--sunset-sky-start);
+    --current-sky-end: var(--sunset-sky-end);
+    --current-mountain-foreground: var(--sunset-mountain-foreground);
+    --current-mountain-midground: var(--sunset-mountain-midground);
+    --current-mountain-far: var(--sunset-mountain-far);
+    --current-mountain-background: var(--sunset-mountain-background);
+    --current-cloud-color: var(--sunset-cloud-flat);
+    --current-fog-light: var(--sunset-fog-light);
+    --current-atmosphere-color: var(--sunset-atmosphere-color);
+    --current-atmosphere-heavy: var(--sunset-atmosphere-heavy);
+    --current-particle-color: var(--sunset-particle-color);
+}
+
+
+.time-night {
+    --current-sky-start: var(--night-sky-start);
+    --current-sky-end: var(--night-sky-end);
+    --current-moon-core: var(--night-moon-core);
+    --current-moon-glow: var(--night-moon-glow);
+    --current-star-color: var(--night-star-color);
+    --current-mountain-foreground: var(--night-mountain-foreground);
+    --current-mountain-midground: var(--night-mountain-midground);
+    --current-mountain-far: var(--night-mountain-far);
+    --current-mountain-background: var(--night-mountain-background);
+    --current-cloud-color: var(--night-cloud-flat);
+    --current-fog-light: var(--night-fog-light);
+    --current-atmosphere-color: var(--night-atmosphere-color);
+    --current-atmosphere-heavy: var(--night-atmosphere-heavy);
+    --current-particle-color: var(--night-particle-color);
+} 

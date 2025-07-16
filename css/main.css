@@ -1,0 +1,590 @@
+/* ========================================
+   SkyClock - メインCSS
+   ======================================== */
+
+
+:root {
+    
+    /* --glass-bg: rgba(255, 255, 255, 0.1); */
+    /* --glass-border: rgba(255, 255, 255, 0.2); */
+    /* --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); */
+    
+    --text-color: #ffffff;
+    --text-shadow: none; 
+    
+    
+    --morning-sky-start: #ff7f50;
+    --morning-sky-end: #87ceeb;
+    --day-sky-start: #87ceeb;
+    --day-sky-end: #b0e0e6;
+    --sunset-sky-start: #ff6347;
+    --sunset-sky-end: #ff4500;
+    --night-sky-start: #191970;
+    --night-sky-end: #4b0082;
+    
+    
+    --sun-core: #ffd700;
+    --sun-glow: #ff8c00;
+    --sun-ray: #ff6347;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto Mono', 'Helvetica Neue', Helvetica, Arial, monospace;
+    font-weight: 700;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ========================================
+   時計表示エリア
+   ======================================== */
+
+.clock-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent; 
+    border-radius: 0; 
+    padding: 0.5rem; 
+    text-align: center;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.time {
+    font-size: 3.5rem; 
+    font-weight: 400; 
+    color: var(--text-color);
+    font-family: 'Roboto Mono', 'Helvetica Neue', Helvetica, Arial, monospace;
+    letter-spacing: 2px; 
+    margin-bottom: 0.25rem; 
+    opacity: 0.95; 
+    line-height: 1.2; 
+}
+
+.date {
+    font-size: 1.2rem; 
+    color: var(--text-color);
+    opacity: 0.8; 
+    font-weight: 300; 
+    font-family: 'Roboto Mono', 'Helvetica Neue', Helvetica, Arial, monospace;
+    letter-spacing: 1px; 
+    line-height: 1.4; 
+}
+
+
+.time-morning .clock-container {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.time-morning .time {
+    opacity: 0.98;
+}
+
+.time-morning .date {
+    opacity: 0.85;
+}
+
+.time-day .clock-container {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.time-day .time {
+    opacity: 0.95;
+}
+
+.time-day .date {
+    opacity: 0.8;
+}
+
+.time-sunset .clock-container {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.time-sunset .time {
+    opacity: 0.97;
+}
+
+.time-sunset .date {
+    opacity: 0.82;
+}
+
+.time-night .clock-container {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.time-night .time {
+    opacity: 0.9;
+}
+
+.time-night .date {
+    opacity: 0.75;
+}
+
+/* ========================================
+   背景・空の演出
+   ======================================== */
+
+.sky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: background 2s ease-in-out;
+    z-index: -1;
+}
+
+/* ========================================
+   天体の演出（リファレンス準拠版）
+   ======================================== */
+
+#sun {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    z-index: 100;
+    transition: all 2s ease-in-out;
+    will-change: transform; 
+    transform: translateZ(0); 
+    mix-blend-mode: screen; 
+}
+
+
+#sun::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    background: #ffffff; 
+    border-radius: 50%;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.8),
+        0 0 40px rgba(255, 255, 255, 0.6),
+        
+        0 0 80px rgba(255, 255, 255, 0.3),
+        0 0 120px rgba(255, 255, 255, 0.1),
+        0 0 160px rgba(255, 255, 255, 0.05),
+        0 0 200px rgba(255, 255, 255, 0.02),
+        0 0 240px rgba(255, 255, 255, 0.01),
+        0 0 280px rgba(255, 255, 255, 0.005),
+        0 0 320px rgba(255, 255, 255, 0.002),
+        0 0 360px rgba(255, 255, 255, 0.001),
+        0 0 400px rgba(255, 255, 255, 0);
+}
+
+
+#sun::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px; 
+    height: 400px; 
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(255, 255, 255, 0.7) 5%,
+        rgba(255, 255, 255, 0.6) 10%, 
+        rgba(255, 255, 255, 0.5) 15%, 
+        rgba(255, 255, 255, 0.4) 20%, 
+        rgba(255, 255, 255, 0.3) 25%, 
+        rgba(255, 255, 255, 0.2) 30%, 
+        rgba(255, 255, 255, 0.15) 35%, 
+        rgba(255, 255, 255, 0.1) 40%, 
+        rgba(255, 255, 255, 0.08) 45%, 
+        rgba(255, 255, 255, 0.06) 50%, 
+        rgba(255, 255, 255, 0.04) 55%, 
+        rgba(255, 255, 255, 0.03) 60%, 
+        rgba(255, 255, 255, 0.02) 65%, 
+        rgba(255, 255, 255, 0.015) 70%, 
+        rgba(255, 255, 255, 0.01) 75%, 
+        rgba(255, 255, 255, 0.008) 80%, 
+        rgba(255, 255, 255, 0.005) 85%, 
+        rgba(255, 255, 255, 0.003) 90%, 
+        rgba(255, 255, 255, 0.001) 95%, 
+        rgba(255, 255, 255, 0) 100%); 
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: sunGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes sunGlow {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+}
+
+
+#sun .sun-rays {
+    display: none;
+}
+
+
+#sun .sun-horizon {
+    display: none;
+}
+
+
+.time-morning #sun::before {
+    background: #ffffff;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.9),
+        0 0 40px rgba(255, 220, 180, 0.7),
+        0 0 80px rgba(255, 220, 180, 0.3),
+        0 0 120px rgba(255, 220, 180, 0.1),
+        0 0 160px rgba(255, 220, 180, 0.05),
+        0 0 200px rgba(255, 220, 180, 0.02),
+        0 0 240px rgba(255, 220, 180, 0.01),
+        0 0 280px rgba(255, 220, 180, 0.005),
+        0 0 320px rgba(255, 220, 180, 0.002),
+        0 0 360px rgba(255, 220, 180, 0.001),
+        0 0 400px rgba(255, 220, 180, 0);
+}
+
+.time-morning #sun::after {
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(255, 220, 180, 0.7) 5%,
+        rgba(255, 220, 180, 0.6) 10%, 
+        rgba(255, 220, 180, 0.5) 15%, 
+        rgba(255, 220, 180, 0.4) 20%, 
+        rgba(255, 220, 180, 0.3) 25%, 
+        rgba(255, 220, 180, 0.2) 30%, 
+        rgba(255, 220, 180, 0.15) 35%, 
+        rgba(255, 220, 180, 0.1) 40%, 
+        rgba(255, 220, 180, 0.08) 45%, 
+        rgba(255, 220, 180, 0.06) 50%, 
+        rgba(255, 220, 180, 0.04) 55%, 
+        rgba(255, 220, 180, 0.03) 60%, 
+        rgba(255, 220, 180, 0.02) 65%, 
+        rgba(255, 220, 180, 0.015) 70%, 
+        rgba(255, 220, 180, 0.01) 75%, 
+        rgba(255, 220, 180, 0.008) 80%, 
+        rgba(255, 220, 180, 0.005) 85%, 
+        rgba(255, 220, 180, 0.003) 90%, 
+        rgba(255, 220, 180, 0.001) 95%, 
+        rgba(255, 220, 180, 0) 100%); 
+}
+
+.time-day #sun::before {
+    background: #ffffff;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 1),
+        0 0 40px rgba(255, 255, 255, 0.8),
+        0 0 80px rgba(255, 255, 255, 0.3),
+        0 0 120px rgba(255, 255, 255, 0.1),
+        0 0 160px rgba(255, 255, 255, 0.05),
+        0 0 200px rgba(255, 255, 255, 0.02),
+        0 0 240px rgba(255, 255, 255, 0.01),
+        0 0 280px rgba(255, 255, 255, 0.005),
+        0 0 320px rgba(255, 255, 255, 0.002),
+        0 0 360px rgba(255, 255, 255, 0.001),
+        0 0 400px rgba(255, 255, 255, 0);
+}
+
+.time-day #sun::after {
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(255, 255, 255, 0.7) 5%,
+        rgba(255, 255, 255, 0.6) 10%, 
+        rgba(255, 255, 255, 0.5) 15%, 
+        rgba(255, 255, 255, 0.4) 20%, 
+        rgba(255, 255, 255, 0.3) 25%, 
+        rgba(255, 255, 255, 0.2) 30%, 
+        rgba(255, 255, 255, 0.15) 35%, 
+        rgba(255, 255, 255, 0.1) 40%, 
+        rgba(255, 255, 255, 0.08) 45%, 
+        rgba(255, 255, 255, 0.06) 50%, 
+        rgba(255, 255, 255, 0.04) 55%, 
+        rgba(255, 255, 255, 0.03) 60%, 
+        rgba(255, 255, 255, 0.02) 65%, 
+        rgba(255, 255, 255, 0.015) 70%, 
+        rgba(255, 255, 255, 0.01) 75%, 
+        rgba(255, 255, 255, 0.008) 80%, 
+        rgba(255, 255, 255, 0.005) 85%, 
+        rgba(255, 255, 255, 0.003) 90%, 
+        rgba(255, 255, 255, 0.001) 95%, 
+        rgba(255, 255, 255, 0) 100%); 
+}
+
+.time-sunset #sun::before {
+    background: #ffffff;
+    box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.9),
+        0 0 40px rgba(255, 200, 150, 0.7),
+        0 0 80px rgba(255, 200, 150, 0.3),
+        0 0 120px rgba(255, 200, 150, 0.1),
+        0 0 160px rgba(255, 200, 150, 0.05),
+        0 0 200px rgba(255, 200, 150, 0.02),
+        0 0 240px rgba(255, 200, 150, 0.01),
+        0 0 280px rgba(255, 200, 150, 0.005),
+        0 0 320px rgba(255, 200, 150, 0.002),
+        0 0 360px rgba(255, 200, 150, 0.001),
+        0 0 400px rgba(255, 200, 150, 0);
+}
+
+.time-sunset #sun::after {
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.8) 0%, 
+        rgba(255, 200, 150, 0.7) 5%,
+        rgba(255, 200, 150, 0.6) 10%, 
+        rgba(255, 200, 150, 0.5) 15%, 
+        rgba(255, 200, 150, 0.4) 20%, 
+        rgba(255, 200, 150, 0.3) 25%, 
+        rgba(255, 200, 150, 0.2) 30%, 
+        rgba(255, 200, 150, 0.15) 35%, 
+        rgba(255, 200, 150, 0.1) 40%, 
+        rgba(255, 200, 150, 0.08) 45%, 
+        rgba(255, 200, 150, 0.06) 50%, 
+        rgba(255, 200, 150, 0.04) 55%, 
+        rgba(255, 200, 150, 0.03) 60%, 
+        rgba(255, 200, 150, 0.02) 65%, 
+        rgba(255, 200, 150, 0.015) 70%, 
+        rgba(255, 200, 150, 0.01) 75%, 
+        rgba(255, 200, 150, 0.008) 80%, 
+        rgba(255, 200, 150, 0.005) 85%, 
+        rgba(255, 200, 150, 0.003) 90%, 
+        rgba(255, 200, 150, 0.001) 95%, 
+        rgba(255, 200, 150, 0) 100%); 
+}
+
+#moon {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(200, 200, 255, 0.6) 70%, transparent 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.4),
+        0 0 30px rgba(200, 200, 255, 0.2),
+        
+        0 0 60px rgba(255, 255, 255, 0.15),
+        0 0 100px rgba(200, 200, 255, 0.08),
+        inset 0 0 15px rgba(255, 255, 255, 0.3);
+    z-index: 100;
+    transition: all 2s ease-in-out;
+    will-change: transform; 
+    transform: translateZ(0); 
+    mix-blend-mode: screen; 
+    opacity: 0.8; 
+}
+
+/* ========================================
+   星の演出（フラットデザイン版）
+   ======================================== */
+
+.star {
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 4px rgba(255, 255, 255, 0.6),
+        0 0 8px rgba(255, 255, 255, 0.3);
+    
+    
+    z-index: 5;
+    animation: twinkle 3s infinite alternate;
+    will-change: transform; 
+    transform: translateZ(0); 
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ========================================
+   レスポンシブ対応（フラットデザイン版）
+   ======================================== */
+
+@media (max-width: 768px) {
+    .clock-container {
+        padding: 0.2rem; 
+    }
+    
+    .time {
+        font-size: 3rem; 
+    }
+    
+    .date {
+        font-size: 1rem; 
+    }
+    
+    #sun {
+        width: 80px;
+        height: 80px;
+    }
+    
+    #sun::before {
+        width: 50px;
+        height: 50px;
+        box-shadow: 
+            0 0 15px rgba(255, 255, 255, 0.8),
+            0 0 30px rgba(255, 255, 255, 0.6),
+            0 0 60px rgba(255, 255, 255, 0.3),
+            0 0 90px rgba(255, 255, 255, 0.1),
+            0 0 120px rgba(255, 255, 255, 0.05),
+            0 0 150px rgba(255, 255, 255, 0.02),
+            0 0 180px rgba(255, 255, 255, 0.01),
+            0 0 210px rgba(255, 255, 255, 0.005),
+            0 0 240px rgba(255, 255, 255, 0.002),
+            0 0 270px rgba(255, 255, 255, 0.001),
+            0 0 300px rgba(255, 255, 255, 0);
+    }
+    
+    #sun::after {
+        width: 240px; 
+        height: 240px; 
+        background: radial-gradient(circle, 
+            rgba(255, 255, 255, 0.8) 0%, 
+            rgba(255, 255, 255, 0.7) 5%,
+            rgba(255, 255, 255, 0.6) 10%, 
+            rgba(255, 255, 255, 0.5) 15%, 
+            rgba(255, 255, 255, 0.4) 20%, 
+            rgba(255, 255, 255, 0.3) 25%, 
+            rgba(255, 255, 255, 0.2) 30%, 
+            rgba(255, 255, 255, 0.15) 35%, 
+            rgba(255, 255, 255, 0.1) 40%, 
+            rgba(255, 255, 255, 0.08) 45%, 
+            rgba(255, 255, 255, 0.06) 50%, 
+            rgba(255, 255, 255, 0.04) 55%, 
+            rgba(255, 255, 255, 0.03) 60%, 
+            rgba(255, 255, 255, 0.02) 65%, 
+            rgba(255, 255, 255, 0.015) 70%, 
+            rgba(255, 255, 255, 0.01) 75%, 
+            rgba(255, 255, 255, 0.008) 80%, 
+            rgba(255, 255, 255, 0.005) 85%, 
+            rgba(255, 255, 255, 0.003) 90%, 
+            rgba(255, 255, 255, 0.001) 95%, 
+            rgba(255, 255, 255, 0) 100%); 
+    }
+}
+
+@media (max-width: 480px) {
+    .time {
+        font-size: 2.5rem; 
+    }
+    
+    .date {
+        font-size: 0.9rem; 
+    }
+    
+    #sun {
+        width: 60px;
+        height: 60px;
+    }
+    
+    #sun::before {
+        width: 40px;
+        height: 40px;
+        box-shadow: 
+            0 0 12px rgba(255, 255, 255, 0.8),
+            0 0 24px rgba(255, 255, 255, 0.6),
+            0 0 48px rgba(255, 255, 255, 0.3),
+            0 0 72px rgba(255, 255, 255, 0.1),
+            0 0 96px rgba(255, 255, 255, 0.05),
+            0 0 120px rgba(255, 255, 255, 0.02),
+            0 0 144px rgba(255, 255, 255, 0.01),
+            0 0 168px rgba(255, 255, 255, 0.005),
+            0 0 192px rgba(255, 255, 255, 0.002),
+            0 0 216px rgba(255, 255, 255, 0.001),
+            0 0 240px rgba(255, 255, 255, 0);
+    }
+    
+    #sun::after {
+        width: 200px; 
+        height: 200px; 
+        background: radial-gradient(circle, 
+            rgba(255, 255, 255, 0.8) 0%, 
+            rgba(255, 255, 255, 0.7) 5%,
+            rgba(255, 255, 255, 0.6) 10%, 
+            rgba(255, 255, 255, 0.5) 15%, 
+            rgba(255, 255, 255, 0.4) 20%, 
+            rgba(255, 255, 255, 0.3) 25%, 
+            rgba(255, 255, 255, 0.2) 30%, 
+            rgba(255, 255, 255, 0.15) 35%, 
+            rgba(255, 255, 255, 0.1) 40%, 
+            rgba(255, 255, 255, 0.08) 45%, 
+            rgba(255, 255, 255, 0.06) 50%, 
+            rgba(255, 255, 255, 0.04) 55%, 
+            rgba(255, 255, 255, 0.03) 60%, 
+            rgba(255, 255, 255, 0.02) 65%, 
+            rgba(255, 255, 255, 0.015) 70%, 
+            rgba(255, 255, 255, 0.01) 75%, 
+            rgba(255, 255, 255, 0.008) 80%, 
+            rgba(255, 255, 255, 0.005) 85%, 
+            rgba(255, 255, 255, 0.003) 90%, 
+            rgba(255, 255, 255, 0.001) 95%, 
+            rgba(255, 255, 255, 0) 100%); 
+    }
+}
+
+/* ========================================
+   背景（フラットデザイン版）
+   ======================================== */
+
+
+.mountains {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+
+.clouds {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+
+.fog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+}
+
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    pointer-events: none;
+} 

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyClock - 60秒テスト版（一日シミュレーション）</title>
+    
+    <!-- Google Fonts - Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" href="css/colors.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/background.css">
+    
+    <style>
+        
+        .test-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .test-controls button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .test-controls button:hover {
+            background: #357abd;
+        }
+        
+        .test-controls button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .test-info {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4a90e2;
+            border-radius: 2px;
+            transition: width 0.1s ease;
+        }
+        
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        
+        * {
+            will-change: auto;
+        }
+        
+        .mountain-layer,
+        .cloud,
+        .fog-layer,
+        #sun,
+        #moon,
+        .star,
+        .tree,
+        .atmosphere-layer {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <!-- テスト用コントロールパネル -->
+    <div class="test-controls">
+        <h3>60 Second Test Version</h3>
+        <button id="startTest">Start Test</button>
+        <button id="pauseTest">Pause</button>
+        <button id="resetTest">Reset</button>
+        
+        <!-- 速度調整 -->
+        <div style="margin-top: 10px;">
+            <label>Speed: </label>
+            <select id="speedSelect">
+                <option value="1">Normal (60s)</option>
+                <option value="2">2x Speed (30s)</option>
+                <option value="0.5">Half Speed (120s)</option>
+                <option value="0.1" selected>1/10 Speed (600s)</option>
+            </select>
+        </div>
+        
+        <!-- 手動時刻設定 -->
+        <div style="margin-top: 10px;">
+            <label>Time Setting: </label>
+            <input type="range" id="timeSlider" min="0" max="1440" value="0" style="width: 150px;">
+            <span id="manualTime">00:00</span>
+        </div>
+        
+        <div class="test-info">
+            <div>Current Time: <span id="currentTime">00:00:00</span></div>
+            <div>Elapsed Time: <span id="elapsedTime">0s</span></div>
+            <div>Remaining Time: <span id="remainingTime">60s</span></div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+    
+    <!-- 背景の空 -->
+    <div class="sky" id="sky"></div>
+    
+    <!-- Alto's Adventure風背景要素（リファレンス準拠版） -->
+    <div class="mountains"></div>
+    <div class="clouds"></div>
+    <div class="fog"></div>
+    <div class="particles"></div>
+    
+    <!-- 統一空気感レイヤー -->
+    <div class="atmosphere-layer"></div>
+    
+    <!-- 太陽（リファレンス準拠版） -->
+    <div id="sun"></div>
+    
+    <!-- 月 -->
+    <div id="moon"></div>
+    
+    <!-- 星のコンテナ -->
+    <div id="stars"></div>
+    
+    <!-- 時計表示エリア -->
+    <div class="clock-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2024/01/01 (Mon)</div>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="js/color-interpolation.js"></script>
+    <script src="js/background.js"></script>
+    
+    <script>
+        
+        class SoramiTestClock {
+            constructor() {
+                this.timeElement = document.getElementById('time');
+                this.dateElement = document.getElementById('date');
+                this.skyElement = document.getElementById('sky');
+                this.sunElement = document.getElementById('sun');
+                this.moonElement = document.getElementById('moon');
+                this.starsElement = document.getElementById('stars');
+                
+                
+                this.currentTimeElement = document.getElementById('currentTime');
+                this.elapsedTimeElement = document.getElementById('elapsedTime');
+                this.remainingTimeElement = document.getElementById('remainingTime');
+                this.progressFillElement = document.getElementById('progressFill');
+                
+                this.weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                
+                
+                this.testDuration = 60000; 
+                this.speedMultiplier = 0.1; 
+                this.manualMode = false;
+                this.manualTime = 0; 
+                this.startTime = null;
+                this.isRunning = false;
+                this.isPaused = false;
+                this.pauseTime = 0;
+                this.animationId = null;
+                
+                
+                this.backgroundManager = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.initializeBackground();
+                this.updateDisplay();
+            }
+            
+            initializeBackground() {
+                
+                this.backgroundManager = new BackgroundManager();
+                
+                
+                this.setupParallax();
+            }
+            
+            setupParallax() {
+                
+                document.addEventListener('mousemove', (e) => {
+                    this.updateParallax(e.clientX / window.innerWidth, e.clientY / window.innerHeight);
+                });
+                
+                
+                document.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    this.updateParallax(touch.clientX / window.innerWidth, touch.clientY / window.innerHeight);
+                });
+            }
+            
+            updateParallax(mouseX, mouseY) {
+                
+                const layers = document.querySelectorAll('.mountain-layer, .cloud, .fog-layer, .atmosphere-layer, .particles, #sun, #moon');
+                layers.forEach((layer) => {
+                    let depth = parseFloat(layer.getAttribute('data-depth'));
+                    
+                    
+                    if (!depth) {
+                        if (layer.classList.contains('mountain-layer')) {
+                            if (layer.classList.contains('foreground')) depth = 0.15;
+                            else if (layer.classList.contains('midground')) depth = 0.08;
+                            else if (layer.classList.contains('far')) depth = 0.04;
+                            else depth = 0.02; // background
+                        } else if (layer.id === 'sun') {
+                            depth = 0.12;
+                        } else if (layer.id === 'moon') {
+                            depth = 0.12;
+                        } else if (layer.classList.contains('cloud')) {
+                            depth = 0.05;
+                        } else if (layer.classList.contains('fog-layer')) {
+                            depth = 0.03;
+                        } else if (layer.classList.contains('atmosphere-layer')) {
+                            depth = 0.02;
+                        } else if (layer.classList.contains('particles')) {
+                            depth = 0.1;
+                        } else {
+                            depth = 0.02;
+                        }
+                    }
+                    
+                    const translateX = (mouseX - 0.5) * depth * 100;
+                    const translateY = (mouseY - 0.5) * depth * 50;
+                    
+                    layer.style.transform = `translate(${translateX}px, ${translateY}px) translateZ(0)`;
+                });
+            }
+            
+            setupEventListeners() {
+                document.getElementById('startTest').addEventListener('click', () => this.startTest());
+                document.getElementById('pauseTest').addEventListener('click', () => this.togglePause());
+                document.getElementById('resetTest').addEventListener('click', () => this.resetTest());
+                
+                
+                document.getElementById('speedSelect').addEventListener('change', (e) => {
+                    this.speedMultiplier = parseFloat(e.target.value);
+                    this.testDuration = 60000 / this.speedMultiplier;
+                });
+                
+                
+                document.getElementById('timeSlider').addEventListener('input', (e) => {
+                    this.manualTime = parseInt(e.target.value);
+                    this.manualMode = true;
+                    this.updateManualTime();
+                });
+                
+                document.getElementById('timeSlider').addEventListener('mouseup', () => {
+                    
+                    setTimeout(() => {
+                        this.manualMode = false;
+                    }, 100);
+                });
+            }
+            
+            startTest() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.isPaused = false;
+                this.startTime = Date.now() - this.pauseTime;
+                this.animate();
+                
+                document.getElementById('startTest').disabled = true;
+                document.getElementById('pauseTest').disabled = false;
+            }
+            
+            togglePause() {
+                if (!this.isRunning) return;
+                
+                if (this.isPaused) {
+                    
+                    this.isPaused = false;
+                    this.startTime = Date.now() - this.pauseTime;
+                    this.animate();
+                    document.getElementById('pauseTest').textContent = '一時停止';
+                } else {
+                    
+                    this.isPaused = true;
+                    this.pauseTime = Date.now() - this.startTime;
+                    cancelAnimationFrame(this.animationId);
+                    document.getElementById('pauseTest').textContent = '再開';
+                }
+            }
+            
+            resetTest() {
+                this.isRunning = false;
+                this.isPaused = false;
+                this.startTime = null;
+                this.pauseTime = 0;
+                cancelAnimationFrame(this.animationId);
+                
+                document.getElementById('startTest').disabled = false;
+                document.getElementById('pauseTest').disabled = true;
+                document.getElementById('pauseTest').textContent = '一時停止';
+                
+                this.updateDisplay();
+            }
+            
+            animate() {
+                if (!this.isRunning || this.isPaused) return;
+                
+                
+                if (this.manualMode) {
+                    this.animationId = requestAnimationFrame(() => this.animate());
+                    return;
+                }
+                
+                const elapsed = Date.now() - this.startTime;
+                const progress = Math.min(elapsed / this.testDuration, 1);
+                
+                
+                const simulatedHours = progress * 24;
+                const hours = Math.floor(simulatedHours);
+                const minutes = Math.floor((simulatedHours - hours) * 60);
+                const seconds = Math.floor(((simulatedHours - hours) * 60 - minutes) * 60);
+                const milliseconds = Math.floor(((simulatedHours - hours) * 60 - minutes) * 60 - seconds) * 1000;
+                
+                
+                const testDate = new Date(2024, 0, 1); 
+                testDate.setHours(hours, minutes, seconds, milliseconds);
+                
+                this.updateTimeDisplay(testDate);
+                this.updateDateDisplay(testDate);
+                this.updateTimeOfDay(testDate);
+                this.updateTestInfo(elapsed, progress);
+                
+                
+                const totalMinutes = hours * 60 + minutes;
+                document.getElementById('timeSlider').value = totalMinutes;
+                document.getElementById('manualTime').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                
+                if (progress < 1) {
+                    
+                    this.animationId = requestAnimationFrame(() => this.animate());
+                } else {
+                    
+                    this.isRunning = false;
+                    document.getElementById('startTest').disabled = false;
+                    document.getElementById('pauseTest').disabled = true;
+                    document.getElementById('pauseTest').textContent = '一時停止';
+                }
+            }
+            
+            updateManualTime() {
+                
+                const hours = Math.floor(this.manualTime / 60);
+                const minutes = this.manualTime % 60;
+                
+                const testDate = new Date(2024, 0, 1);
+                testDate.setHours(hours, minutes, 0, 0);
+                
+                this.updateTimeDisplay(testDate);
+                this.updateDateDisplay(testDate);
+                this.updateTimeOfDay(testDate);
+                
+                document.getElementById('manualTime').textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+            
+            updateTimeDisplay(date) {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                this.timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+                this.currentTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            
+            updateDateDisplay(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const weekday = this.weekdays[date.getDay()];
+                this.dateElement.textContent = `${year}/${month}/${day} (${weekday})`;
+            }
+            
+            updateTimeOfDay(date) {
+                const hour = date.getHours();
+                
+                
+                if (window.testColorInterpolation) {
+                    
+                    window.testColorInterpolation.setSimulationTime(date);
+                    
+                    this.updateCelestialBodies(hour);
+                    this.updateCelestialPosition(date);
+                } else if (window.colorInterpolation) {
+                    
+                    this.updateCelestialBodies(hour);
+                    this.updateCelestialPosition(date);
+                } else {
+                    
+                    this.updateSkyBackground(hour);
+                    this.updateCelestialBodies(hour);
+                    this.updateCelestialPosition(date);
+                    this.updateBackgroundEffects(hour);
+                }
+            }
+            
+            updateSkyBackground(hour) {
+                let background;
+                
+                if (hour >= 5 && hour < 8) {
+                    
+                    background = 'linear-gradient(to bottom, var(--morning-sky-start), var(--morning-sky-end))';
+                    this.showSun();
+                    this.hideMoon();
+                    this.hideStars();
+                } else if (hour >= 8 && hour < 17) {
+                    
+                    background = 'linear-gradient(to bottom, var(--day-sky-start), var(--day-sky-end))';
+                    this.showSun();
+                    this.hideMoon();
+                    this.hideStars();
+                } else if (hour >= 17 && hour < 19) {
+                    
+                    background = 'linear-gradient(to bottom, var(--sunset-sky-start), var(--sunset-sky-end))';
+                    this.showSun();
+                    this.hideMoon();
+                    this.hideStars();
+                } else {
+                    
+                    background = 'linear-gradient(to bottom, var(--night-sky-start), var(--night-sky-end))';
+                    this.hideSun();
+                    this.showMoon();
+                    this.showStars();
+                }
+                
+                this.skyElement.style.background = background;
+            }
+            
+            updateCelestialBodies(hour) {
+                
+                if (hour >= 6 && hour < 18) {
+                    
+                    this.showSun();
+                    this.hideMoon();
+                    this.hideStars();
+                } else if (hour >= 17 && hour < 19) {
+                    
+                    this.showSun();
+                    this.showMoon();
+                    this.hideStars();
+                } else {
+                    
+                    this.hideSun();
+                    this.showMoon();
+                    this.showStars();
+                }
+            }
+            
+            updateCelestialPosition(date) {
+                const hour = date.getHours();
+                const minute = date.getMinutes();
+                const second = date.getSeconds();
+                const t = hour + (minute / 60) + (second / 3600); 
+                
+                
+                if (t >= 6 && t < 19) {
+                    this.showSun();
+                    
+                    
+                    const sunX = (t - 6) / 13; 
+                    
+                    
+                    const sunY = -4 * Math.pow(sunX - 0.5, 2) + 1;
+                    
+                    
+                    const displayY = 0.15 + (sunY * 0.2);
+                    
+                    this.sunElement.style.left = `${sunX * 100}%`;
+                    this.sunElement.style.top = `${displayY * 100}%`;
+                    
+                    
+                    if (t >= 6 && t < 8) {
+                        
+                        this.sunElement.style.filter = 'brightness(1.1) saturate(1.2)';
+                    } else if (t >= 8 && t < 17) {
+                        
+                        this.sunElement.style.filter = 'brightness(1.0) saturate(1.0)';
+                    } else {
+                        
+                        const sunsetProgress = (t - 17) / 2; 
+                        const brightness = 1.05 - (sunsetProgress * 0.3); 
+                        const saturation = 1.15 - (sunsetProgress * 0.3); 
+                        this.sunElement.style.filter = `brightness(${brightness}) saturate(${saturation})`;
+                    }
+                    
+                    console.log(`太陽: t=${t.toFixed(2)}, 位置=(${(sunX*100).toFixed(1)}%, ${(displayY*100).toFixed(1)}%)`);
+                } else {
+                    
+                    this.hideSun();
+                }
+                
+                
+                const night = (t >= 18 || t < 6);
+                if (night) {
+                    this.showMoon();
+                    
+                    
+                    let moonX;
+                    if (t >= 18) {
+                        
+                        moonX = (t - 18) / 12; 
+                        console.log(`月（18時以降）: t=${t.toFixed(2)}, moonX=${moonX.toFixed(3)}`);
+                    } else {
+                        
+                        moonX = 0.5 + (t / 12); 
+                        console.log(`月（0-6時）: t=${t.toFixed(2)}, moonX=${moonX.toFixed(3)}`);
+                    }
+                    
+                    
+                    const moonY = -4 * Math.pow(moonX - 0.5, 2) + 1;
+                    
+                    
+                    const displayY = 0.15 + (moonY * 0.2);
+                    
+                    this.moonElement.style.left = `${moonX * 100}%`;
+                    this.moonElement.style.top = `${displayY * 100}%`;
+                    
+                    
+                    if (t >= 17.5 && t <= 18.5) {
+                        
+                        const fadeProgress = (t - 17.5) / 1; 
+                        const opacity = 0.8 + (fadeProgress * 0.2); 
+                        this.moonElement.style.opacity = opacity;
+                    } else {
+                        this.moonElement.style.opacity = '1.0';
+                    }
+                    
+                    
+                    if (t >= 18 && t < 20) {
+                        
+                        const eveningProgress = (t - 18) / 2; 
+                        const warmth = 1.0 - (eveningProgress * 0.3); 
+                        const saturation = 0.8 + (eveningProgress * 0.2); 
+                        this.moonElement.style.filter = `brightness(${warmth}) saturate(${saturation})`;
+                    } else {
+                        
+                        this.moonElement.style.filter = 'brightness(0.7) saturate(1.0)';
+                    }
+                    
+                    console.log(`月の最終位置: t=${t.toFixed(2)}, moonX=${moonX.toFixed(3)}, 位置=(${(moonX*100).toFixed(1)}%, ${(displayY*100).toFixed(1)}%)`);
+                } else {
+                    
+                    this.hideMoon();
+                }
+            }
+            
+            
+            easeInOutQuad(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            }
+            
+            updateBackgroundEffects(hour) {
+                
+                let timeOfDay;
+                if (hour >= 5 && hour < 8) {
+                    timeOfDay = 'morning';
+                } else if (hour >= 8 && hour < 17) {
+                    timeOfDay = 'day';
+                } else if (hour >= 17 && hour < 19) {
+                    timeOfDay = 'sunset';
+                } else {
+                    timeOfDay = 'night';
+                }
+                
+                document.body.className = `time-${timeOfDay}`;
+                
+                
+                this.updateMountainColors();
+                
+                
+                this.updateFogColors();
+                
+                
+                this.updateCloudColors();
+            }
+            
+            updateMountainColors() {
+                const mountainLayers = document.querySelectorAll('.mountain-layer path');
+                mountainLayers.forEach((path, index) => {
+                    const layer = index === 0 ? 'background' : index === 1 ? 'far' : index === 2 ? 'midground' : 'foreground';
+                    path.setAttribute('fill', this.getMountainColor(layer));
+                });
+            }
+            
+            getMountainColor(layer) {
+                
+                const colors = {
+                    foreground: 'var(--current-mountain-foreground)',
+                    midground: 'var(--current-mountain-midground)',
+                    far: 'var(--current-mountain-far)',
+                    background: 'var(--current-mountain-background)'
+                };
+                return colors[layer] || '#2d1810';
+            }
+            
+            updateFogColors() {
+                const fogLayers = document.querySelectorAll('.fog-layer');
+                fogLayers.forEach((fog) => {
+                    fog.style.background = 'linear-gradient(to bottom, transparent 0%, var(--current-fog-light) 50%, transparent 100%)';
+                });
+            }
+            
+            updateCloudColors() {
+                const clouds = document.querySelectorAll('.cloud');
+                clouds.forEach((cloud) => {
+                    cloud.style.background = 'var(--current-cloud-color)';
+                });
+            }
+            
+            showSun() {
+                this.sunElement.style.display = 'block';
+            }
+            
+            hideSun() {
+                this.sunElement.style.display = 'none';
+            }
+            
+            showMoon() {
+                this.moonElement.style.display = 'block';
+            }
+            
+            hideMoon() {
+                this.moonElement.style.display = 'none';
+            }
+            
+            showStars() {
+                this.starsElement.style.display = 'block';
+                this.updateStars();
+            }
+            
+            hideStars() {
+                this.starsElement.style.display = 'none';
+            }
+            
+            updateStars() {
+                this.starsElement.innerHTML = ''; 
+                
+                
+                for (let i = 0; i < 50; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    this.starsElement.appendChild(star);
+                }
+            }
+            
+            updateTestInfo(elapsed, progress) {
+                const elapsedSeconds = Math.floor(elapsed / 1000);
+                const remainingSeconds = Math.max(0, 60 - elapsedSeconds);
+                
+                this.elapsedTimeElement.textContent = `${elapsedSeconds}s`;
+                this.remainingTimeElement.textContent = `${remainingSeconds}s`;
+                this.progressFillElement.style.width = `${progress * 100}%`;
+            }
+            
+            updateDisplay() {
+                
+                const initialDate = new Date(2024, 0, 1, 0, 0, 0);
+                this.updateTimeDisplay(initialDate);
+                this.updateDateDisplay(initialDate);
+                this.updateTimeOfDay(initialDate);
+                this.updateTestInfo(0, 0);
+            }
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            window.testColorInterpolation = new TestColorInterpolation();
+            console.log('テスト版 - テスト色補間システムの状態:', {
+                testColorInterpolation: window.testColorInterpolation,
+                isActive: !!window.testColorInterpolation
+            });
+            
+            
+            if (window.testColorInterpolation) {
+                console.log('テスト版 - テスト色補間システムを強制更新');
+                window.testColorInterpolation.updateColors();
+            }
+            
+            new SoramiTestClock();
+        });
+    </script>
+</body>
+</html> 

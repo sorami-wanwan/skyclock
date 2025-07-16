@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyClock</title>
+    
+    <!-- Google Fonts - Roboto Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルの読み込み -->
+    <link rel="stylesheet" href="css/colors.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/background.css">
+    
+    <style>
+        
+        .fallback {
+            display: none;
+        }
+        
+        
+        .css-fallback .fallback {
+            display: block;
+        }
+        
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        
+        * {
+            will-change: auto;
+        }
+        
+        .mountain-layer,
+        .cloud,
+        .fog-layer,
+        #sun,
+        #moon,
+        .star,
+        .tree,
+        .atmosphere-layer {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景の空 -->
+    <div class="sky" id="sky"></div>
+    
+    <!-- 背景要素 -->
+    <div class="mountains"></div>
+    <div class="clouds"></div>
+    <div class="fog"></div>
+    <div class="particles"></div>
+    
+    <!-- 統一空気感レイヤー -->
+    <div class="atmosphere-layer"></div>
+    
+    <!-- 太陽（リファレンス準拠版） -->
+    <div id="sun"></div>
+    
+    <!-- 月 -->
+    <div id="moon"></div>
+    
+    <!-- 星のコンテナ -->
+    <div id="stars"></div>
+    
+    <!-- 時計表示エリア -->
+    <div class="clock-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">2024/01/01 (Mon)</div>
+    </div>
+    
+    <!-- フォールバック用のメッセージ -->
+    <div class="fallback" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 9999;">
+        <h2>SkyClock</h2>
+        <p>CSSファイルの読み込みに失敗しました。</p>
+        <p>ブラウザの設定を確認してください。</p>
+    </div>
+
+    <!-- JavaScriptファイルの読み込み -->
+    <script src="js/color-interpolation.js"></script>
+    <script src="js/clock.js"></script>
+    <script src="js/background.js"></script>
+    
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('色補間システムの状態:', {
+                colorInterpolation: window.colorInterpolation,
+                isActive: !!window.colorInterpolation
+            });
+            
+            
+            if (window.colorInterpolation) {
+                console.log('色補間システムを強制更新');
+                window.colorInterpolation.updateColors();
+            }
+        });
+        
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const testElement = document.createElement('div');
+            testElement.style.position = 'fixed';
+            testElement.style.top = '-9999px';
+            document.body.appendChild(testElement);
+            
+            const computedStyle = window.getComputedStyle(testElement);
+            const isCSSLoaded = computedStyle.position === 'fixed';
+            
+            document.body.removeChild(testElement);
+            
+            if (!isCSSLoaded) {
+                document.body.classList.add('css-fallback');
+            }
+        });
+        
+        
+        window.addEventListener('error', (e) => {
+            console.error('JavaScript error:', e.error);
+        });
+        
+        
+        if ('performance' in window) {
+            window.addEventListener('load', () => {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`ページ読み込み時間: ${loadTime}ms`);
+                
+                
+                if (loadTime > 2000) {
+                    console.warn('ページ読み込み時間が2秒を超えています');
+                }
+            });
+        }
+        
+        
+        window.addEventListener('resize', () => {
+            
+            const canvas = document.querySelector('.particles canvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+        
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('ページが非表示になりました - パフォーマンス最適化を適用');
+            } else {
+                console.log('ページが表示されました - 通常のパフォーマンスに戻します');
+            }
+        });
+    </script>
+</body>
+</html> 
